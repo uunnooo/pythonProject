@@ -72,6 +72,7 @@ pickle.dump(pdFS, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdFS.pkl', 'wb')
 pickle.dump(pdST, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdST.pkl', 'wb'))
 pickle.dump(pdFT, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdFT.pkl', 'wb'))
 
+# 수정했다
 
 
 
