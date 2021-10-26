@@ -16,6 +16,8 @@ pdFS = pd.DataFrame()  # Foot shape 정보 프레임
 pdST = pd.DataFrame()  # Static 정보 프레임
 pdFT = pd.DataFrame()  # Flattrac shape 정보 프레임
 
+tmppath = 'D:\\uno\\unoDB\\'
+
 QueryStartdata = '2021-09-01'
 # 쿼리문
 query_FOOTSHAPE = "SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
@@ -53,26 +55,28 @@ query_FLATTRAC = "SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             ON tr_plmspec_rcx.plm_spec_obj_id = tr_spec.plm_spec_obj_id \
             WHERE tr_item.result_date > TO_DATE('2021-09-01', 'YYYY-MM-DD')"
 
-# 쿼리 전송 및 데이터 저장
+#쿼리 전송 및 데이터 저장
 pdFS = pd.read_sql(query_FOOTSHAPE, connection)
 pdST = pd.read_sql(query_STATIC, connection)
 pdFT = pd.read_sql(query_FLATTRAC, connection)
 connection.close()
 
-# 데이터 저장 확인용
-# ''''
-pdFS.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FSData.csv", mode='w')
-pdST.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\STData.csv", mode='w')
-pdFT.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FTData.csv", mode='w')
-# '''
+# #데이터 저장 확인용
+# pdFS.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FSData.csv", mode='w')
+# pdST.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\STData.csv", mode='w')
+# pdFT.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FTData.csv", mode='w')
+
+#시간이 많이 걸리니 데이터 저장하고 불러서 작동 확인. Binary 파일로 저장
+pickle.dump(pdFS, open(tmppath+'pdFS.pkl', 'wb'))
+pickle.dump(pdST, open(tmppath+'pdST.pkl', 'wb'))
+pickle.dump(pdFT, open(tmppath+'pdFT.pkl', 'wb'))
+
+# # Load 데이터를 쓰는경우
+# pdFS = pickle.load(open('D:\\uno\\unoDB\\pdFS.pkl', 'rb'))
+# pdST = pickle.load(open('D:\\uno\\unoDB\\pdST.pkl', 'rb'))
+# pdFT = pickle.load(open('D:\\uno\\unoDB\\pdFT.pkl', 'rb'))
 
 
-# 시간이 많이 걸리니 데이터 저장하고 불러서 작동 확인. Binary 파일로 저장
-pickle.dump(pdFS, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdFS.pkl', 'wb'))
-pickle.dump(pdST, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdST.pkl', 'wb'))
-pickle.dump(pdFT, open('D:\\workroom\\p_workroom\\_DATA_Traing\\pdFT.pkl', 'wb'))
-
-# 수정했다
 
 
 
