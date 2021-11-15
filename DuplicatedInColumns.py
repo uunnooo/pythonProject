@@ -22,14 +22,13 @@ def fnDuplicatedInColumns(df,keep) :
     return ddf
 
 def fnEmptyRowReplace(df, colRef, colName) :
-    '''
+    """
     같은 column(정보)들인데 DB Table의 종류에 따라 데이터가 없는것들이 있다.
     이러한 경우 두가지의 정보들을 합쳐서 하나로 반환한다.
-    선택된 기준 열을 기준으로 합치다. 기준열에 값이 없는 부분을 다른 열들의 값으로 채움
+    선택된 기준 열을 기준으로 합친다. 기준열에 값이 없는 부분을 다른 열들의 값으로 채움
     colRef = number
-    colName = string
-
-    '''
+    colNum = string
+    """
 
     # import pandas
     import numpy
@@ -37,7 +36,7 @@ def fnEmptyRowReplace(df, colRef, colName) :
     ddf = df[colName]
 
     if len(ddf.columns) > 1 :
-        for i in numpy.where(ddf.loc[colRef:, 'SPEC_NO'].isnull())[0].tolist() :
+        for i in numpy.where(ddf.loc[colRef:, colName].isnull())[0].tolist() :
             ddf.loc[i][colRef] = ddf.loc[i][colRef-1]
         df[colName] = ddf[colName]
     else :
