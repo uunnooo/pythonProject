@@ -4,7 +4,7 @@ import pickle
 # Import Oracle DB Package
 import cx_Oracle
 # Credentials
-import _auth_config as auth
+import _AuthConfig as auth
 
 # Support Functions
 pd.set_option('mode.chained_assignment',  None) # pandas Chained Assignement warning off
@@ -66,9 +66,9 @@ pdFT = pd.read_sql(query_FLATTRAC, connection)
 connection.close()
 
 #시간이 많이 걸리니 데이터 저장하고 불러서 작동 확인. Binary 파일로 저장
-pickle.dump(pdFS, open(tmppath+'pdFS.pkl', 'wb'))
+pickle.dump(pdFS, open(tmppath+'pdST.pkl', 'wb'))
 pickle.dump(pdST, open(tmppath+'pdST.pkl', 'wb'))
-pickle.dump(pdFT, open(tmppath+'pdFS.pkl', 'wb'))
+pickle.dump(pdFT, open(tmppath+'pdST.pkl', 'wb'))
 
 
 

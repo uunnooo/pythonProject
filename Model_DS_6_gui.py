@@ -15,7 +15,7 @@ import pickle
 import pandas as pd
 pd.set_option('mode.chained_assignment',  None)
 import cx_Oracle
-import _auth_config as auth
+import _AuthConfig as auth
 import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas

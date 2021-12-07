@@ -4,7 +4,7 @@ import pickle
 # Import Oracle DB Package
 import cx_Oracle
 # Credentials
-import _auth_config as auth
+import _AuthConfig as auth
 # Support Functions
 pd.set_option('mode.chained_assignment',  None)
 
@@ -18,7 +18,8 @@ pdFT = pd.DataFrame()  # Flattrac shape 정보 프레임
 
 tmppath = 'D:\\uno\\unoDB\\'
 
-QueryStartdata = "'2021-09-01'"
+QueryStartdata = "'2018-01-01'"
+QueryEnddata = "'2019-01-01'"
 # 쿼리문
 query_FOOTSHAPE = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             enoviaif.tr_item.*, enoviaif.tr_result_FOOTSHAPE.*, enoviaif.tr_result_FOOTSHAPE_DETAIL.*\
@@ -31,7 +32,7 @@ query_FOOTSHAPE = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             ON tr_spec.spec_seq = tr_result_FOOTSHAPE_DETAIL.spec_seq \
             LEFT JOIN ENOVIAIF.tr_plmspec_rcx \
             ON tr_plmspec_rcx.plm_spec_obj_id = tr_spec.plm_spec_obj_id \
-            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD')"
+            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD') and tr_item.result_date < TO_DATE({QueryEnddata}, 'YYYY-MM-DD')"
 
 query_STATIC = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             enoviaif.tr_item.*, enoviaif.tr_result_STATIC.*\
@@ -42,7 +43,7 @@ query_STATIC = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             ON tr_spec.spec_seq = tr_result_STATIC.spec_seq \
             LEFT JOIN ENOVIAIF.tr_plmspec_rcx \
             ON tr_plmspec_rcx.plm_spec_obj_id = tr_spec.plm_spec_obj_id \
-            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD')"
+            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD') and tr_item.result_date < TO_DATE({QueryEnddata}, 'YYYY-MM-DD')"
 
 query_FLATTRAC = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             enoviaif.tr_item.*, enoviaif.tr_result_FLATTRAC.*\
@@ -53,7 +54,7 @@ query_FLATTRAC = f"SELECT enoviaif.tr_plmspec_rcx.*, enoviaif.tr_spec.*,\
             ON tr_spec.spec_seq = tr_result_FLATTRAC.spec_seq \
             LEFT JOIN ENOVIAIF.tr_plmspec_rcx \
             ON tr_plmspec_rcx.plm_spec_obj_id = tr_spec.plm_spec_obj_id \
-            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD')"
+            WHERE tr_item.result_date > TO_DATE({QueryStartdata}, 'YYYY-MM-DD') and tr_item.result_date < TO_DATE({QueryEnddata}, 'YYYY-MM-DD')"
 
 #쿼리 전송 및 데이터 저장
 pdFS = pd.read_sql(query_FOOTSHAPE, connection)
@@ -62,19 +63,19 @@ pdFT = pd.read_sql(query_FLATTRAC, connection)
 connection.close()
 
 # #데이터 저장 확인용
-# pdFS.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FSData.csv", mode='w')
+# pdST.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FSData.csv", mode='w')
 # pdST.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\STData.csv", mode='w')
-# pdFS.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FTData.csv", mode='w')
+# pdST.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\FTData.csv", mode='w')
 
 #시간이 많이 걸리니 데이터 저장하고 불러서 작동 확인. Binary 파일로 저장
 pickle.dump(pdFS, open(tmppath+'pdFS.pkl', 'wb'))
 pickle.dump(pdST, open(tmppath+'pdST.pkl', 'wb'))
-pickle.dump(pdFT, open(tmppath+'pdFS.pkl', 'wb'))
+pickle.dump(pdFT, open(tmppath+'pdFT.pkl', 'wb'))
 
 # # Load 데이터를 쓰는경우
-# pdFS = pickle.load(open('D:\\uno\\unoDB\\pdFS.pkl', 'rb'))
 # pdST = pickle.load(open('D:\\uno\\unoDB\\pdST.pkl', 'rb'))
-# pdFS = pickle.load(open('D:\\uno\\unoDB\\pdFS.pkl', 'rb'))
+# pdST = pickle.load(open('D:\\uno\\unoDB\\pdST.pkl', 'rb'))
+# pdST = pickle.load(open('D:\\uno\\unoDB\\pdST.pkl', 'rb'))
 
 
 

@@ -2,19 +2,21 @@ import pandas as pd
 import numpy as np
 import pickle
 import re
-import DuplicatedInColumns
+import _DropDupliCol_
 import MakeConditionDB
 
-# pickle.dump(pdFS, open(tmppath+'pdFS.pkl', 'wb'))
+# pickle.dump(pdST, open(tmppath+'pdST.pkl', 'wb'))
 # set a path for files saving data
+tmppathTEST = 'D:\\uno\\unoDB\\Test\\'
 tmppath = 'D:\\uno\\unoDB\\'
 tmppath2 = 'D:\\uno\\unoDB\\FS\\'
 tmppath3 = 'D:\\uno\\unoDB\\FS\\TC1\\'
 tmppath4 = 'D:\\uno\\unoDB\\FS\\TC2\\'
 tmppath5 = 'D:\\uno\\unoDB\\FS\\TC3\\'
+
 pdFS = pd.DataFrame()  # Flattrac shape 정보 프레임
 # 저장된 정보를 이용해서 프리 프로세싱 시작
-pdFS = pickle.load(open(tmppath + 'pdFS.pkl', 'rb'))
+pdFS = pickle.load(open(tmppath + 'pdST.pkl', 'rb'))
 
 '''
 Load Rate per에 의해 분할되어 있는 결과값들을 하나의 행으로 합쳐서 DB 생성
@@ -61,19 +63,29 @@ for specNo in listduSN :
         '''
         print('시험조건은 같고 REQ_NO, TIRE_NO, TEST_COND_NO 만 다른경우' + specNo)
         tmpDF.to_csv(tmppath3 + '_' + specNo + '.csv')
-        '''
+        
         if len(tmpDF.drop_duplicates('CONFIRM_DATE')) > 1 :
             # 평가한 시점이 다르다면 최신 데이터를 사용
             tmpDF1 = tmpDF.iloc[[tmpDF['CONFIRM_DATE'].argmax()],:].copy()
         else :
             # 평가한 시점이 같다면 평균값을 사용
-            tmpResultVal = pd.DataFrame([p.findall(str) for str in tmpDF.columns[666:]]).isnull()
-            indResultVal = np.where(tmpResultVal)[0] + 666
-            tmpDF1 = tmpDF.drop_duplicates('SPEC_NO').copy()
-            for colNum in indResultVal :
-                tmpDF1[tmpDF.columns[colNum]] =\
-                    format(tmpDF[tmpDF.columns[colNum]].astype('float').mean(), '.2f')
-                tmpDF1[tmpDF.columns[colNum]].astype('object')
+        '''
+    # 평가한 시점이 다르다면 최신 데이터만을 사용
+        if len(tmpDF.drop_duplicates('CONFIRM_DATE')) > 1:
+            # 최신 날짜에 해당하는 시험들만 DB로 생성(과거 데이터들까지 평균이 되는것을 방지 하기 위해)
+            maxDate = tmpDF.iloc[[tmpDF['CONFIRM_DATE'].argmax()], np.where(tmpDF.columns == 'CONFIRM_DATE')[0][0]]
+            tmpDF = tmpDF[tmpDF['CONFIRM_DATE'] == maxDate.iloc[0]].copy()
+            # tmpResultVal = pd.DataFrame([p.findall(str) for str in tmpDF.columns[666:]]).isnull()
+            # indResultVal = np.where(tmpResultVal)[0] + 666
+
+        ## 모든 데이터는 평균값 사용(시점이 같다면 평균값을 사용)
+        tmpResultVal = pd.DataFrame([p.findall(str) for str in tmpDF.columns[666:]]).isnull()
+        indResultVal = np.where(tmpResultVal)[0] + 666
+        tmpDF1 = tmpDF.drop_duplicates('SPEC_NO').copy()
+        for colNum in indResultVal :
+            tmpDF1[tmpDF.columns[colNum]] =\
+                format(tmpDF[tmpDF.columns[colNum]].astype('float').mean(), '.2f')
+            tmpDF1[tmpDF.columns[colNum]].astype('object')
     elif flagCase & 0b11000 :
         '''
         print('시험조건이 다른경우' + specNo)        

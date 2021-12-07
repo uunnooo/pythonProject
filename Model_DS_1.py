@@ -4,7 +4,7 @@ import pickle
 # Import Oracle DB Package
 import cx_Oracle
 # Credentials
-import _auth_config as auth
+import _AuthConfig as auth
 # Support Functions
 pd.set_option('mode.chained_assignment',  None)
 

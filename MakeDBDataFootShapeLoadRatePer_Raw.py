@@ -1,27 +1,27 @@
 import pandas as pd
 import numpy as np
 import pickle
-import DuplicatedInColumns
+import _DropDupliCol_
 import MakeConditionDB
 
 
-# pickle.dump(pdFS, open(tmppath+'pdFS.pkl', 'wb'))
+# pickle.dump(pdST, open(tmppath+'pdST.pkl', 'wb'))
 # set a path for files saving data
 tmppath = 'D:\\uno\\unoDB\\'
 tmppath2 = 'D:\\uno\\unoDB\\FS\\'
 pdFS = pd.DataFrame()  # Flattrac shape 정보 프레임
 
 # 저장된 정보를 이용해서 프리 프로세싱 시작
-pdFS = pickle.load(open(tmppath + 'pdFS.pkl', 'rb'))
+pdFS = pickle.load(open(tmppath + 'pdST.pkl', 'rb'))
 
 
 valList = ['SPEC_NO', 'REQ_NO', 'TIRE_NO', 'TEST_COND_NO', 'AIR', 'TEST_LOAD', 'LOAD_RATE_PER']
 
 ## 중복되는 칼럼을 합치기
 # 칼럼을 합치기 전에 합치게 될 기준열을 정하고 기준열에 없는 정보들은 다른열에 있는 값으로 채움
-tmpFS1 = DuplicatedInColumns.fnEmptyRowReplace(pdFS, 0, 'SPEC_NO')
+tmpFS1 = _DropDupliCol_.fnEmptyRowReplace(pdFS, 0, 'SPEC_NO')
 # 중복되는 칼럼들 제거(제거시 각 테이블별 없는 정보들이있어서 주의 필요)
-tmpFS2 = DuplicatedInColumns.fnDuplicatedInColumns(tmpFS1, 'first')
+tmpFS2 = _DropDupliCol_.fnDuplicatedInColumns(tmpFS1, 'first')
 
 # CA가 없는 모든값 제거, CA가 없는 DB는 필요가 없다.
 rCADF = tmpFS2.dropna(subset=['TOTAL_CONTACT_AREA']).copy()

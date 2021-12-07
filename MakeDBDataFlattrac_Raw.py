@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import pickle
-import DuplicatedInColumns
+import _DropDupliCol_
 import os
 
 
@@ -14,7 +14,7 @@ tmppath = 'D:\\uno\\unoDB\\'
 # Import Oracle DB Package
 import cx_Oracle
 # Credentials
-import _auth_config as auth
+import _AuthConfig as auth
 
 # def fnCompareColumns(df1, df2, df3):
 #     TmpIndex1 = []
@@ -35,34 +35,34 @@ pdST = pd.DataFrame()  # Static 정보 프레임
 pdFT = pd.DataFrame()  # Flattrac shape 정보 프레임
 
 
-pdFS = pickle.load(open(tmppath+'pdFS.pkl', 'rb'))
+pdFS = pickle.load(open(tmppath+'pdST.pkl', 'rb'))
 pdST = pickle.load(open(tmppath+'pdST.pkl', 'rb'))
-pdFT = pickle.load(open(tmppath+'pdFS.pkl', 'rb'))
+pdFT = pickle.load(open(tmppath+'pdST.pkl', 'rb'))
 
 '''
-pdFS.head(100).to_csv(tmppath+'RAWFS.csv')
-pdFS.head(100).to_csv(tmppath+'RAWFT.csv')
+pdST.head(100).to_csv(tmppath+'RAWFS.csv')
+pdST.head(100).to_csv(tmppath+'RAWFT.csv')
 pdST.head(100).to_csv(tmppath+'RAWST.csv')
 '''
 '''
 # 비교 해서 check는 해보지만 너무 오래 걸림
 # DB 테이블의 결과값들에 대한 부분외에는 다 동일하다고 보고 진행함함
-result1, result2, result3 = fnCompareColumns(pdFS, pdST, pdFS)
+result1, result2, result3 = fnCompareColumns(pdST, pdST, pdST)
 
 result = list(set(result1) | set(result2) | set(result3))
 result.sort()
-colIndexFS = list(range(0 , len(pdFS.columns)))
+colIndexFS = list(range(0 , len(pdST.columns)))
 colIndexST = list(range(0 , len(pdST.columns)))
-colIndexFT = list(range(0 , len(pdFS.columns)))
+colIndexFT = list(range(0 , len(pdST.columns)))
 resultFS = list(set(colIndexFS) - set(result))
 resultST = list(set(colIndexST) - set(result))
 resultFT = list(set(colIndexFT) - set(result))
 print("result " , result)
 '''
 # Spec No에 대한 정보 합치기
-tmpFS1 = DuplicatedInColumns.fnEmptyRowReplace(pdFS, 0, 'SPEC_NO')
-tmpFT1 = DuplicatedInColumns.fnEmptyRowReplace(pdFT, 0, 'SPEC_NO')
-tmpST1 = DuplicatedInColumns.fnEmptyRowReplace(pdST, 0, 'SPEC_NO')
+tmpFS1 = _DropDupliCol_.fnEmptyRowReplace(pdFS, 0, 'SPEC_NO')
+tmpFT1 = _DropDupliCol_.fnEmptyRowReplace(pdFT, 0, 'SPEC_NO')
+tmpST1 = _DropDupliCol_.fnEmptyRowReplace(pdST, 0, 'SPEC_NO')
 
 '''
 tmpFS1.head(100).to_csv(tmppath+'DBFS1.csv')
@@ -70,11 +70,11 @@ tmpFS1.head(100).to_csv(tmppath+'DBFT1.csv')
 tmpST1.head(100).to_csv(tmppath+'DBST1.csv')
 '''
 # 중복되는 Column 제거
-tmpFS2 = DuplicatedInColumns.fnDuplicatedInColumns(tmpFS1,'first')
-tmpFT2 = DuplicatedInColumns.fnDuplicatedInColumns(tmpFT1,'first')
-tmpST2 = DuplicatedInColumns.fnDuplicatedInColumns(tmpST1,'first')
+tmpFS2 = _DropDupliCol_.fnDuplicatedInColumns(tmpFS1, 'first')
+tmpFT2 = _DropDupliCol_.fnDuplicatedInColumns(tmpFT1, 'first')
+tmpST2 = _DropDupliCol_.fnDuplicatedInColumns(tmpST1, 'first')
 
-# print(pdFS.columns[687:706])
+# print(pdST.columns[687:706])
 # 용량이 문제인지 파일이 제대로 만들어지지 않는다
 # tmpST.to_excel('D:\\workroom\\p_workroom\\_DATA_Traing\\DBST.xlsx',
 #                sheet_name = 'Sheet1', na_rep = 'NaN',
