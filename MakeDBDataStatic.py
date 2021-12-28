@@ -30,7 +30,7 @@ Load Rate per에 의해 분할되어 있는 결과값들을 하나의 행으로 
 Load Rate Per에 대한 결과값들을 모두 처리(한개의 Foot shape x결과에는 항상 다중 하중 조건에 대한 결과들이 존재)
 그외에 누락된 데이터 및 여러가지 기본 처리들은 사전에 처리
 '''
-# rDF = MakeConditionDB.fnAddMesrFlagConditionSTDB(pdST, tmppath2)
+# rDF = MakeConditionDB.fnAddMeasureFlagConditionSTDB(pdST, tmppath2)
 rDF = pickle.load(open(tmppath2+'pdSTUno.pkl', 'rb')) # 저장되어 있는 데이터 사용
 
 '''
