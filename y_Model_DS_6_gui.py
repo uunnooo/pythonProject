@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from datetime import datetime
-import _use_cols
+import y_use_cols
 import pickle
 import pandas as pd
 pd.set_option('mode.chained_assignment',  None)
@@ -24,9 +24,9 @@ import numpy as np
 import random
 
 #UI파일 연결
-Ui_MainWindow = uic.loadUiType("UI_Main.ui")[0]
+Ui_MainWindow = uic.loadUiType("y_UI_Main.ui")[0]
 # from UI_Main import Ui_MainWindow
-# pyuic5 -x UI_Main.ui -o UI_Main.py # UI 파일을 Py 파일로 변환 < 커맨드창에서 실행
+# pyuic5 -x y_UI_Main.ui -o y_UI_Main.py # UI 파일을 Py 파일로 변환 < 커맨드창에서 실행
 # from UI_Sub1 import Ui_SubWindow1
 
 from sklearn.ensemble import RandomForestRegressor
@@ -125,8 +125,8 @@ def import_spec_from_PLM(specs1):
         df1 = pd.concat([df1, spec_data])
     connection.close()
     # 스펙을 변환하기
-    import _PLM_SPEC_CHANGE  # 필요한 스펙으로 변환하는 함수 정의
-    df2 = _PLM_SPEC_CHANGE.Change1(df1)
+    import z_PLM_SPEC_CHANGE  # 필요한 스펙으로 변환하는 함수 정의
+    df2 = z_PLM_SPEC_CHANGE.Change1(df1)
 
     df2["TEST_LOAD"] = 450
     df2["RIM_WIDTH"] = 7.0
@@ -151,7 +151,7 @@ targets = _DS_data['1.Target list']
 all_data = _DS_data['3.Input Data (Removed Outlier)']
 samples = _DS_data['4.Input_Sample for New Prediction']
 samples = samples.drop(1,0)
-allrows = _use_cols.cols
+allrows = y_use_cols.cols
 # categoricals dict type 일 경우, 아래 코드 사용
 for i in categoricals:
     categoricals[i].sort()

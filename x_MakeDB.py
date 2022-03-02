@@ -3,12 +3,12 @@ def fnMakeFootshapeDB(raw_df) :
     import pandas as pd
     import numpy as np
     import re
-    import MakeConditionDB
+    import x_MakeConditionDB
 
     r = re.compile('CONTACT|SQUARE|ROUNDNESS')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
 
     ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
-    rDF = MakeConditionDB.fnAddLoadRatePerConditionFSDB(raw_df)
+    rDF = x_MakeConditionDB.fnAddLoadRatePerConditionFSDB(raw_df)
     listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates() # 중복 Spec_NO list 생성
     # listduSN = 'CPKT1029296X00001'
 
@@ -26,7 +26,7 @@ def fnMakeFootshapeDB(raw_df) :
         count += 1
         tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
         # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
-        tmprCondDF = MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        tmprCondDF = x_MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
         newtmpDF = newtmpDF.append(tmprCondDF)
         print(str(count) + ' of ' + str(totalCount))
     ResultDF = pd.concat([newtmprDF2,newtmpDF])
@@ -38,12 +38,12 @@ def fnMakeStaticDB(raw_df):
     import pandas as pd
     import numpy as np
     import re
-    import MakeConditionDB
+    import x_MakeConditionDB
 
     r = re.compile('^RESULT(?!_DATE)')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
 
     ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
-    rDF = MakeConditionDB.fnAddMeasureFlagConditionSTDB(raw_df)
+    rDF = x_MakeConditionDB.fnAddMeasureFlagConditionSTDB(raw_df)
     listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates()  # 중복 Spec_NO list 생성
     # listduSN = 'CPKT1029296X00001'
 
@@ -62,7 +62,7 @@ def fnMakeStaticDB(raw_df):
         tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
         # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
         # print(specNo) #디버깅용
-        tmprCondDF = MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        tmprCondDF = x_MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
         newtmpDF = newtmpDF.append(tmprCondDF)
         print(str(count) + ' of ' + str(totalCount))
     ResultDF = pd.concat([newtmprDF2, newtmpDF])
@@ -73,12 +73,12 @@ def fnMakeFlattracDB(raw_df):
     import pandas as pd
     import numpy as np
     import re
-    import MakeConditionDB
+    import x_MakeConditionDB
 
     r = re.compile('^CA(?![^a-z])')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
 
     ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
-    rDF = MakeConditionDB.fnPreprocessingFTDB(raw_df)
+    rDF = x_MakeConditionDB.fnPreprocessingFTDB(raw_df)
     listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates()  # 중복 Spec_NO list 생성
     # listduSN = 'CPKT1029296X00001'
 
@@ -97,7 +97,7 @@ def fnMakeFlattracDB(raw_df):
         tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
         # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
         # print(specNo) #디버깅용
-        tmprCondDF = MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        tmprCondDF = x_MakeConditionDB.fnMakeTestConditionDB(tmpDF, r, indStartResult)
         newtmpDF = newtmpDF.append(tmprCondDF)
         print(str(count) + ' of ' + str(totalCount))
     ResultDF = pd.concat([newtmprDF2, newtmpDF])

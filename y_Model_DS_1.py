@@ -64,13 +64,13 @@ df2["RIM_WIDTH"] = df["RIM_WIDTH"]
 df2["AIR"] = df["AIR"]
 
 # 스펙을 변환하기
-import _PLM_SPEC_CHANGE # 필요한 스펙으로 변환하는 함수 정의
-df3 = _PLM_SPEC_CHANGE.Change2(df2)
+import z_PLM_SPEC_CHANGE # 필요한 스펙으로 변환하는 함수 정의
+df3 = z_PLM_SPEC_CHANGE.Change2(df2)
 # 사용할 cols를 정의하고, One - Hot Encoding 적용하기
 
 
-import _use_cols
-use_cols = _use_cols.cols_DS
+import y_use_cols
+use_cols = y_use_cols.cols_DS
 df4 = df3[use_cols]
 df4["SPEC_NO"]=df3["SPEC_NO"]
 df4 = df4.dropna()
@@ -80,7 +80,7 @@ df6 = pd.DataFrame()
 df6 = df4.merge(df5)
 # df6.to_csv("D:\\workroom\\p_workroom\\_DATA_Traing\\check_data.csv", index=None, encoding='UTF-8')
 
-scale_cols = _use_cols.scale_cols_DS
+scale_cols = y_use_cols.scale_cols_DS
 # one hot encording을 적용하기 전에, 숫자 데이타를 지정하기
 df7 = df6.copy().astype('object') #Data Type을 모두 object로 통일화 하기
 

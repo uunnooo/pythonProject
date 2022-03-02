@@ -5,9 +5,6 @@ def fnDuplicatedInColumns(df,keep) :
     # 같은 columns 찾기
     duplicate_cols = df.columns[df.columns.duplicated()]
     """
-    import pandas
-
-    ddf = pandas.DataFrame()
 
     ddf = df.T
     ddf.reset_index(inplace = True)
@@ -29,8 +26,6 @@ def fnEmptyRowReplace(df, colRef, colName) :
     colRef = number
     colName = string
     """
-
-    # import pandas
     import numpy
 
     ddf = df[colName]

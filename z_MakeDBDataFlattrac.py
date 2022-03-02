@@ -1,6 +1,6 @@
 import pandas as pd
 import pickle
-import _DropDupliCol_
+import _Preprocessing_
 
 # set a path for files saving data
 tmppath = 'D:\\uno\\unoDB\\'
@@ -10,9 +10,9 @@ pdFT = pickle.load(open(tmppath+'pdFT.pkl', 'rb'))
 
 ## 중복되는 칼럼을 합치기
 # 칼럼을 합치기 전에 합치게 될 기준열을 정하고 기준열에 없는 정보들은 다른열에 있는 값으로 채움
-tmpFT1 = _DropDupliCol_.fnEmptyRowReplace(pdFT, 0, 'SPEC_NO')
+tmpFT1 = _Preprocessing_.fnEmptyRowReplace(pdFT, 0, 'SPEC_NO')
 # 중복되는 칼럼들 제거(제거시 각 테이블별 없는 정보들이있어서 주의 필요)
-tmpFT2 = _DropDupliCol_.fnDuplicatedInColumns(tmpFT1, 'first')
+tmpFT2 = _Preprocessing_.fnDuplicatedInColumns(tmpFT1, 'first')
 # CA가 없는 모든값 제거, CA가 없는 DB는 필요가 없다.
 rCADF = tmpFT2.dropna(subset=['CA']).copy()
 

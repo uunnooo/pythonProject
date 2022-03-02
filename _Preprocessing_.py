@@ -1,3 +1,45 @@
+def fnDuplicatedInColumns(df,keep) :
+    """
+    같은 columns 제거
+
+    # 같은 columns 찾기
+    duplicate_cols = df.columns[df.columns.duplicated()]
+    """
+
+    ddf = df.T
+    ddf.reset_index(inplace = True)
+    ddf.drop(ddf[ddf.duplicated(['index'],keep)].index, inplace=True)
+    ddf.set_index('index', inplace = True)
+    ddf = ddf.T
+    ddf.index = range(0, len(ddf.index))
+
+    if not ddf.columns[ddf.columns.duplicated()].empty :
+        print("there is duplication pleas check directly")
+
+    return ddf
+
+def fnEmptyRowReplace(df, colRef, colName) :
+    """
+    같은 column(정보)들인데 DB Table의 종류에 따라 데이터가 없는것들이 있다.
+    이러한 경우 두가지의 정보들을 합쳐서 하나로 반환한다.
+    선택된 기준 열을 기준으로 합친다. 기준열에 값이 없는 부분을 다른 열들의 값으로 채움
+    colRef = number
+    colName = string
+    """
+    import numpy
+
+    ddf = df[colName]
+
+    if len(ddf.columns) > 1 :
+        for i in numpy.where(ddf.loc[:, colName].isnull())[0].tolist() :
+            ddf.iloc[i][colRef] = ddf.iloc[i][colRef-1]
+        df[colName] = ddf[colName]
+    else :
+        print("there is no duplicated columns")
+
+    return df
+
+
 def fnMakeTestConditionDB(tmp_df, result_exp, ind_start) :
     '''
     하나의 스펙에 대해서 컨디션 조건에 따라 분류 하고, 우선적으로 최신 날짜의 데이터를 찾아 내고, 최신 데이터를 평균하여 데이터 처리
@@ -11,7 +53,6 @@ def fnMakeTestConditionDB(tmp_df, result_exp, ind_start) :
     '''
     import pandas as pd
     import numpy as np
-    import re
 
     tmprCondDF = pd.DataFrame()
     # AIR 나 LOAD 컨디션이 비어 있는 데이터는 DB에서 제외
@@ -84,17 +125,17 @@ def fnAddLoadRatePerConditionFSDB(df) :
     '''
     import pandas as pd
     import numpy as np
-    import _DropDupliCol_
 
     ## 전처리
     # 칼럼을 합치기 전에 합치게 될 기준열을 정하고 기준열에 없는 정보들은 다른열에 있는 값으로 채움
-    DF1 = _DropDupliCol_.fnEmptyRowReplace(df, 0, 'SPEC_NO')
+    DF1 = fnEmptyRowReplace(df, 0, 'SPEC_NO')
+    DF2 = fnEmptyRowReplace(DF1, 0, 'PATTERN')
     # 중복되는 칼럼들 제거(제거시 각 테이블별 없는 정보들이있어서 주의 필요)
-    DF2 = _DropDupliCol_.fnDuplicatedInColumns(DF1, 'first')
+    DF3 = fnDuplicatedInColumns(DF2, 'first')
     # TOTAL_CONTACT_AREA가 없는 모든값 제거, 없으면 Result가 없다. 결과가 없는 시험 데이터 제거
-    rDF1 = DF2.dropna(subset=['TOTAL_CONTACT_AREA']).copy()
+    rDF1 = DF3.dropna(subset=['TOTAL_CONTACT_AREA']).copy()
     # CA가 0인값 제거, 결과가 없는것으로 판단
-    rDF1 = rDF1.drop(rDF1[DF2['TOTAL_CONTACT_AREA'] == 0].index).copy()
+    rDF1 = rDF1.drop(rDF1[DF3['TOTAL_CONTACT_AREA'] == 0].index).copy()
     # AIR가 없거나 Load가 없는 데이터 제거, 시험조건이 없는 경우의 데이터는 사용 불가
     rDF1 = rDF1.drop(rDF1[rDF1['LOAD_KG'].isna() | rDF1['AIR'].isna()].index).copy()
 
@@ -150,15 +191,15 @@ def fnAddMeasureFlagConditionSTDB(df) :
     '''
     import pandas as pd
     import numpy as np
-    import _DropDupliCol_
 
     ## 전처리
     # 칼럼을 합치기 전에 합치게 될 기준열을 정하고 기준열에 없는 정보들은 다른열에 있는 값으로 채움
-    DF1 = _DropDupliCol_.fnEmptyRowReplace(df, 0, 'SPEC_NO')
+    DF1 = fnEmptyRowReplace(df, 0, 'SPEC_NO')
+    DF2 = fnEmptyRowReplace(DF1, 0, 'PATTERN')
     # 중복되는 칼럼들 제거(제거시 각 테이블별 없는 정보들이있어서 주의 필요)
-    DF2 = _DropDupliCol_.fnDuplicatedInColumns(DF1, 'first')
+    DF3 = fnDuplicatedInColumns(DF2, 'first')
     # Static의 결과가 없는 모든값 제거, 결과가 없는 시험 데이터 제거
-    rDF1 = DF2.dropna(subset=['RESULT']).copy()
+    rDF1 = DF3.dropna(subset=['RESULT']).copy()
     # Static의 결과가 0인값 제거, 결과가 없는것으로 판단
     rDF2 = rDF1.drop(rDF1[rDF1['RESULT'] == 0].index).copy()
     # Kv만 여러 하중조건으로 결과 측정, MESR_FLAG가 없는 값은 KV가 아님
@@ -267,15 +308,119 @@ def fnPreprocessingFTDB(df) :
     :param df: raw Data frame
     :return: flatrac의 경우 한번의 시험으로 하나의 데이터 생성. 전처리만 처리해 주면 1차 데이터 완성
     '''
-    import _DropDupliCol_
+    import _Preprocessing_
 
     ## 전처리
     # 칼럼을 합치기 전에 합치게 될 기준열을 정하고 기준열에 없는 정보들은 다른열에 있는 값으로 채움
-    DF1 = _DropDupliCol_.fnEmptyRowReplace(df, 0, 'SPEC_NO')
-    DF2 = _DropDupliCol_.fnEmptyRowReplace(DF1, 0, 'PATTERN')
+    DF1 = fnEmptyRowReplace(df, 0, 'SPEC_NO')
+    DF2 = fnEmptyRowReplace(DF1, 0, 'PATTERN')
     # 중복되는 칼럼들 제거(제거시 각 테이블별 없는 정보들이있어서 주의 필요)
-    DF3 = _DropDupliCol_.fnDuplicatedInColumns(DF2, 'first')
+    DF3 = fnDuplicatedInColumns(DF2, 'first')
     # CA가 없는 모든값 제거, CA가 없는 DB는 필요가 없다.
     rDF = DF3.dropna(subset=['CA']).copy()
 
     return rDF.copy()
+
+
+def fnMakeFootshapeDB(raw_df):
+    import pandas as pd
+    import numpy as np
+    import re
+
+    r = re.compile('CONTACT|SQUARE|ROUNDNESS')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
+
+    ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
+    rDF = fnAddLoadRatePerConditionFSDB(raw_df)
+    listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates()  # 중복 Spec_NO list 생성
+    # listduSN = 'CPKT1029296X00001'
+
+    newtmprDF = rDF.drop_duplicates('SPEC_NO').copy()
+    ## SPEC_NO가 중복되지 않은 DB 생성
+    newtmprDF2 = newtmprDF[newtmprDF['SPEC_NO'].isin \
+        (pd.Series(list(set(rDF['SPEC_NO']) - set(listduSN))))].copy()
+    newtmpDF = pd.DataFrame()  # 중복된 DB를 처리 후 저장할 DataFrame 생성
+    indStartResult = np.where(rDF.columns == 'AIR')[0][0]  # 조건에 따라 결과들을 횡으로 연결, 연결된 결과 범위 설정
+
+    ## 중복 리스트를 이용해서 중복시의 조건들을 구분
+    totalCount = len(listduSN)
+    count = 0
+    for specNo in listduSN:
+        count += 1
+        tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
+        # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
+        tmprCondDF = fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        newtmpDF = newtmpDF.append(tmprCondDF)
+        print(str(count) + ' of ' + str(totalCount))
+    ResultDF = pd.concat([newtmprDF2, newtmpDF])
+    # print('Done')
+    return ResultDF
+
+
+def fnMakeStaticDB(raw_df):
+    import pandas as pd
+    import numpy as np
+    import re
+
+    r = re.compile('^RESULT(?!_DATE)')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
+
+    ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
+    rDF = fnAddMeasureFlagConditionSTDB(raw_df)
+    listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates()  # 중복 Spec_NO list 생성
+    # listduSN = 'CPKT1029296X00001'
+
+    newtmprDF = rDF.drop_duplicates('SPEC_NO').copy()
+    ## SPEC_NO가 중복되지 않은 DB 생성
+    newtmprDF2 = newtmprDF[newtmprDF['SPEC_NO'].isin \
+        (pd.Series(list(set(rDF['SPEC_NO']) - set(listduSN))))].copy()
+    newtmpDF = pd.DataFrame()  # 중복된 DB를 처리 후 저장할 DataFrame 생성
+    indStartResult = np.where(rDF.columns == 'AIR')[0][0]  # 조건에 따라 결과들을 횡으로 연결, 연결된 결과 범위 설정
+
+    ## 중복 리스트를 이용해서 중복시의 조건들을 구분
+    totalCount = len(listduSN)
+    count = 0
+    for specNo in listduSN:
+        count += 1
+        tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
+        # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
+        # print(specNo) #디버깅용
+        tmprCondDF = fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        newtmpDF = newtmpDF.append(tmprCondDF)
+        print(str(count) + ' of ' + str(totalCount))
+    ResultDF = pd.concat([newtmprDF2, newtmpDF])
+    # print('Done')
+    return ResultDF
+
+
+def fnMakeFlattracDB(raw_df):
+    import pandas as pd
+    import numpy as np
+    import re
+
+    r = re.compile('^CA(?![^a-z])')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
+
+    ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
+    rDF = fnPreprocessingFTDB(raw_df)
+    listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates()  # 중복 Spec_NO list 생성
+    # listduSN = 'CPKT1029296X00001'
+
+    newtmprDF = rDF.drop_duplicates('SPEC_NO').copy()
+    ## SPEC_NO가 중복되지 않은 DB 생성
+    newtmprDF2 = newtmprDF[newtmprDF['SPEC_NO'].isin \
+        (pd.Series(list(set(rDF['SPEC_NO']) - set(listduSN))))].copy()
+    newtmpDF = pd.DataFrame()  # 중복된 DB를 처리 후 저장할 DataFrame 생성
+    indStartResult = np.where(rDF.columns == 'AIR')[0][0]  # 조건에 따라 결과들을 횡으로 연결, 연결된 결과 범위 설정
+
+    ## 중복 리스트를 이용해서 중복시의 조건들을 구분
+    totalCount = len(listduSN)
+    count = 0
+    for specNo in listduSN:
+        count += 1
+        tmpDF = rDF.loc[rDF['SPEC_NO'] == specNo].copy()
+        # 하나의 스펙번호를 기준으로 시험 컨디션 조건(공기압, 시험기준 하중)에 대해서 데이터 처리
+        # print(specNo) #디버깅용
+        tmprCondDF = fnMakeTestConditionDB(tmpDF, r, indStartResult)
+        newtmpDF = newtmpDF.append(tmprCondDF)
+        print(str(count) + ' of ' + str(totalCount))
+    ResultDF = pd.concat([newtmprDF2, newtmpDF])
+    # print('Done')
+    return ResultDF

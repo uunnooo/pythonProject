@@ -9,13 +9,13 @@ def fnMakeFootshapeDB(raw_df) :
     import pandas as pd
     import numpy as np
     import re
-    import MakeConditionDB
+    import x_MakeConditionDB
 
     p = re.compile('^FILE|HINT')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
     r = re.compile('CONTACT|SQUARE|ROUNDNESS')  # 정규 표현식 사용(결과값이 있는 범위를 찾기 위해
 
     ## Load rate per 조건에 대한 값들 처리(같은 시험에 해당하는 Load rate per를 하나의 행으로)
-    rDF = MakeConditionDB.fnAddLoadRatePerConditionFSDB(raw_df)
+    rDF = x_MakeConditionDB.fnAddLoadRatePerConditionFSDB(raw_df)
     listduSN = rDF.loc[rDF['SPEC_NO'].duplicated(), 'SPEC_NO'].drop_duplicates() # 중복 Spec_NO list 생성
     # listduSN = 'CPKT1029296X00001'
 
